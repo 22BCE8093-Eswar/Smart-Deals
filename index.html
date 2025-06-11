@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Deals Hub</title>
+  
+  <style>
+    :root {
+      --primary-color: #1b4332;
+      --secondary-color: #f3f4f6;
+      --text-color: #394352;
+      --card-radius: 12px;
+    }
+
+    #navbar-iframe, .navbar {
+  display: none !important;
+}
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #e0f7fa, #a8c2b1);
+      color: var(--text-color);
+    }
+
+    header {
+  background-color: var(--primary-color);
+  background-image: radial-gradient(rgba(255, 255, 255, 0.278) 1.5px, transparent 1.5px);
+  background-size: 20px 20px;
+  color: white;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+    header div {
+      font-size: 0.9rem;
+      font-weight: normal;
+      margin-top: 0.3rem;
+    }
+
+    .search-section {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 1rem 1rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-section input,
+    .search-section select {
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .product-grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      padding: 1.5rem;
+    }
+
+    .card {
+      background-color: #ffffff;
+      border-radius: var(--card-radius);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card img {
+      width: 100%;
+      height: auto;
+      max-height: 250px;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+    }
+
+    .card-body {
+      padding: 1rem;
+    }
+
+    .card-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+    .buy-btn {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: background-color 0.2s ease;
+    }
+
+    .price-section {
+      font-size: 1rem;
+      margin: 0.4rem 0;
+    }
+
+    .price {
+      color: #1a8917;
+      font-weight: 700;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #999;
+      margin-left: 8px;
+    }
+
+    .discount {
+      color: #e55353;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+
+    .buy-btn:hover {
+      background-color: #515252;
+    }
+
+    footer {
+      margin-top: auto;
+      text-align: center;
+      padding: 1rem;
+      background-color: #e5e7eb;
+      font-size: 0.9rem;
+    }
+
+    .menu-icon {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  cursor: pointer;
+  width: 30px;
+  height: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 10;
+}
+
+.menu-icon div {
+  height: 4px;
+  background-color: white;
+  border-radius: 2px;
+}
+
+.menu-dropdown {
+  display: none;
+  position: absolute;
+  top: 3.5rem;
+  left: 1rem;
+  background-color: white;
+  color: black;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  padding: 0.5rem 0;
+  width: 140px;
+  z-index: 15;
+}
+
+.menu-dropdown a {
+  display: block;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  color: black;
+  cursor: pointer;
+}
+
+.menu-dropdown a:hover {
+  background-color: #f0f0f0;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close-btn {
+  color: #aaa;
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: black;
+}
+
+    .ticker {
+  background: #1b4332;
+  color: #fff;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.7rem 0;
+  border-top: 2px solid #52b788;
+  border-bottom: 2px solid #52b788;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.ticker-text {
+  display: inline-block;
+  padding-left: 100%;
+  animation: scroll-left 18s linear infinite;
+}
+
+.ticker-brief {
+  background: #1b4332; /* a bit darker green for difference */
+  color: #ffffff;      /* lighter greenish text */
+  font-size: 0.9rem;
+  padding: 0.5rem 0;
+  border-top: none;
+  border-bottom: 2px solid #52b788;
+}
+
+.ticker-brief .ticker-text {
+  padding-left: 100%;
+  animation: scroll-left 25s linear infinite; /* slower scroll */
+}
+
+.logo-header {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  padding: 1rem 0;
+}
+
+/* Modal overlay */
+.info-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(27, 67, 50, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* Modal box */
+.info-box {
+  background: white;
+  padding: 2rem 2.5rem;
+  max-width: 400px;
+  width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+  position: relative;
+}
+
+.header-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Logo size for desktop */
+    .logo {
+      width: 500px; /* extra large */
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Tablet adjustment */
+    @media (max-width: 1024px) {
+      .logo {
+        width: 200px;
+      }
+    }
+
+    /* Phone adjustment */
+    @media (max-width: 600px) {
+      .logo {
+        width: 320px;
+      }
+    }
+
+/* Close button */
+.info-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: color 0.2s ease;
+}
+
+.info-close:hover {
+  color: #e55353;
+}
+
+/* Heading style inside modal */
+.info-box h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  border-bottom: 2px solid var(--primary-color);
+  padding-bottom: 0.3rem;
+}
+
+/* Paragraph styling */
+.info-box p {
+  margin-bottom: 1rem;
+}
+
+/* Bullet list style */
+.info-box ul {
+  margin-left: 1.2rem;
+  margin-bottom: 1rem;
+  list-style-type: disc;
+  color: #555;
+}
+
+
+    @keyframes scroll-left {
+      0% {
+        transform: translateX(0%);
+      }
+      100% {
+        transform: translateX(-100%);
+      }
+    }
+
+    @media screen and (max-width: 600px) {
+      .product-grid {
+    grid-template-columns: repeat(2, 1fr); /* 2 cards side by side */
+    gap: 1rem;
+    padding: 1rem;
+  }
+      header {
+        font-size: 1.5rem;
+      }
+      .search-section input,
+      .search-section select {
+        font-size: 0.9rem;
+      }
+      .card {
+        flex: 1 1 calc(50% - 1rem); /* 2 cards per row */
+      }
+    }
+
+    /* Add cursor pointer to cards to show they are clickable */
+    .card {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu-icon" onclick="toggleMenu()">
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <div class="menu-dropdown" id="menuDropdown">
+    <a onclick="showModal('Help')">Help</a>
+    <a onclick="showModal('Contact')">Contact</a>
+    <a onclick="showModal('About')">About</a>
+  </div>
+
+  <div id="infoModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeModal()">&times;</span>
+      <div id="modalText"></div>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-content">
+      <img src="Smart Deals Logo.png" class="logo" alt="Logo" />
+    </div>
+  </header>
+
+  <div class="ticker ticker-brief">
+    <div class="ticker-text">
+      Welcome to Smart Deals Hub! Discover top offers, exciting discounts, and must-have items at amazing prices. Stay tuned for fresh deals daily!
+      At Smart Deals Hub, we bring you the latest products, exclusive discounts, and unbeatable prices daily. Shop smart, save big, and enjoy hassle-free buying experience with us!
+    </div>
+  </div>
+
+  <div class="search-section">
+    <input type="text" id="searchInput" placeholder="Search for a product..." />
+    <select id="categoryFilter" aria-label="Filter products by category">
+      <option value="">All Categories</option>
+    </select>
+  </div>
+
+  <div class="product-grid" id="dealContainer"></div>
+
+  <div class="ticker">
+    <div class="ticker-text">
+      © 2025 Smart Deals Hub. All rights reserved. Designed and developed by Eswar. Unauthorized reproduction or distribution is strictly prohibited.
+    </div>
+  </div>
+
+  <footer>&copy; 2025 Eswar Smart Deals. All Rights Reserved.</footer>
+
+  <script>
+    const products = [
+      {
+        title: "SPARX Men's SFG 14 Flip-Flop",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/51p0u1pv2DL._SY695_.jpg",
+        price: "₹299",
+        original: "₹349",
+        discount: "-14% OFF",
+        link: "https://amzn.in/d/1nwDIU7",
+        category: "footwear",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+      {
+        title: "Redragon M612 Predator Gaming Mouse",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/61vF4LdktpL._SX522_.jpg",
+        price: "₹1199",
+        original: "₹1390",
+        discount: "-14% OFF",
+        link: "https://amzn.in/d/5LzL0br",
+        category: "accessories",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+      {
+        title: "CEDO Tempered Glass for Vivo U10 / Y12 / Y15 / Y17 | Screen Protector Full HD Quality Tempered Glass Anti-Scratch Edge to Edge Coverage with Easy Installation Kit (Black)",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/61yuCdrJtUL._SX679_.jpg",
+        price: "₹199",
+        original: "₹999",
+        discount: "-80% OFF",
+        link: "https://amzn.in/d/bwqkYJc",
+        category: "mobile accessories",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+      {
+        title: "realme 13 Pro 5G (Monet Gold,8GB+128GB)",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/81w8xa+XkSL._SX679_.jpg",
+        price: "₹19,499",
+        original: "₹28,999",
+        discount: "-33% OFF",
+        link: "https://amzn.in/d/fhGI9qq",
+        category: "mobile",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+      {
+        title: "truke Mega 9 New Launch True Wireless in Ear Earbuds W/ 24-Bit Lossless Spatial Audio, 70H Battery Fast Charge Ear Buds, Leather Finish, 13mm Speakers TWS, 40ms Ultra Low Latency, 4Mics ENC",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/81a-MlH3p1L._SX522_.jpg",
+        price: "₹1,299",
+        original: "₹3,999",
+        discount: "-68% OFF",
+        link: "https://amzn.in/d/eLOryUL",
+        category: "mobile accessories",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+      {
+        title: "truke New Launch Crystal Dyno Leather Finish True Wireless in Ear Earbuds w/Spatial Audio, 70H Battery Fast Charge Ear Buds, 13mm Driver HiFi Sound TWS, 40ms Ultra Low Latency, 4Mics ENC- RavenBlack",
+        image: "https://m.media-amazon.com/images/W/MEDIAX_1215821-T1/images/I/41BqW7dlo4L._SX300_SY300_QL70_FMwebp_.jpg",
+        price: "₹999",
+        original: "₹2,999",
+        discount: "-67% OFF",
+        link: "https://amzn.in/d/e5TwB81",
+        category: "mobile accessories",
+        description: "The Realme 13 Pro 5G offers a powerful Octa-core processor with a stunning display and long-lasting battery life, perfect for multimedia and gaming.",
+        video: "https://youtube.com/embed/ER3UchBIhHE?si=fxhCUWLEMhjd901h"
+      },
+    ];
+
+    const container = document.getElementById('dealContainer');
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+
+    function populateCategoryFilter() {
+      const categories = [...new Set(products.map(p => p.category))].sort();
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        categoryFilter.appendChild(option);
+      });
+    }
+
+    function renderProducts() {
+      const searchQuery = searchInput.value.toLowerCase();
+      const selectedCategory = categoryFilter.value;
+
+      container.innerHTML = '';
+
+      const filtered = products.filter(p => {
+        const matchesCategory = selectedCategory === '' || p.category === selectedCategory;
+        const matchesSearch = p.title.toLowerCase().includes(searchQuery);
+        return matchesCategory && matchesSearch;
+      });
+
+      filtered.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${p.image}" alt="${p.title}">
+          <div class="card-body">
+            <div class="card-title">${p.title}</div>
+            <div class="price-section">
+              <span class="price">${p.price}</span>
+              <span class="original-price">${p.original}</span>
+              <span class="discount">${p.discount}</span>
+            </div>
+            <a class="buy-btn" href="${p.link}" target="_blank" rel="noopener noreferrer">Buy Now</a>
+          </div>
+        `;
+
+        // Make the entire card clickable and open product.html with query params
+        card.addEventListener('click', (e) => {
+  const isBuyButton = e.target.closest('.buy-btn');
+  if (isBuyButton) return; // Let the <a href> handle it
+
+  const params = new URLSearchParams({
+    title: p.title,
+    image: p.image,
+    price: p.price,
+    original: p.original,
+    discount: p.discount,
+    link: p.link,
+    category: p.category,
+    description: p.description || 'No description available',
+    video: p.video || ''
+  });
+
+  window.location.href = `product.html?${params.toString()}`;
+});
+
+
+        container.appendChild(card);
+      });
+    }
+
+    populateCategoryFilter();
+    renderProducts();
+
+    searchInput.addEventListener('input', renderProducts);
+    categoryFilter.addEventListener('change', renderProducts);
+
+    function toggleMenu() {
+      const menu = document.getElementById('menuDropdown');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function showModal(option) {
+      const modal = document.getElementById('infoModal');
+      const text = document.getElementById('modalText');
+      const info = {
+        Help: `
+          <h2>Need Help?</h2>
+          <p>We're here to assist you with your shopping experience.</p>
+          <ul>
+            <li>Browse our Frequently Asked Questions (FAQs) for quick answers.</li>
+            <li>Need product assistance or order help? Reach out through our Contact page.</li>
+            <li>Shopping Tip: Use the search bar to quickly find your desired product or deal.</li>
+          </ul>
+        `,
+        Contact: `
+          <h2>Contact Us</h2>
+          <p>We’d love to hear from you!</p>
+          <ul>
+            <<li>Email: <a href="mailto:eswarboyi7@gmail.com">support@smartdealshub.com</a></li>
+            <li>Phone: <a href="tel:+919390205553">+91-9876543210</a></li>
+            <li>Address: Andhra Pradesh,India</li>
+          </ul>
+        `,
+        About: `
+          <h2>About Smart Deals Hub</h2>
+          <p>Smart Deals Hub is your trusted online marketplace for the best deals across electronics, accessories, footwear, and more. We carefully curate offers to bring you great products at unbeatable prices.</p>
+          <p>Our mission is to make shopping simple, fun, and affordable for everyone.</p>
+        `
+      };
+      text.innerHTML = info[option] || '';
+      modal.style.display = 'block';
+      document.getElementById('menuDropdown').style.display = 'none';
+    }
+
+    function closeModal() {
+      document.getElementById('infoModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (!event.target.closest('.menu-icon') && !event.target.closest('.menu-dropdown')) {
+        document.getElementById('menuDropdown').style.display = 'none';
+      }
+      if (event.target === document.getElementById('infoModal')) {
+        closeModal();
+      }
+    }
+  </script>
+</body>
+</html>
